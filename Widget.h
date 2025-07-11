@@ -13,6 +13,12 @@ enum class BtnType{//按钮类型
     Oppo,//取反
 };
 
+enum class Priority{//运算符优先级((优先级最低，取反运算单独处理)
+    PARENTHESES=0,
+    ADD_SUB=1,
+    MUL_DIV_MOD=2,
+};
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class Widget;

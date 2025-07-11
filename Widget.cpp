@@ -6,7 +6,12 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-
+    //运算符优先级映射
+    std::unordered_map<QString,Priority> priority_map={
+        {"-",Priority::ADD_SUB},{"+",Priority::ADD_SUB},
+        {"*",Priority::MUL_DIV_MOD},{"÷",Priority::MUL_DIV_MOD},
+        {"%",Priority::MUL_DIV_MOD}
+    };
     //数字按钮绑定
     connect(ui->Num0,&QPushButton::clicked,this,[this](){
         onClicked(BtnType::Num,"0");
@@ -81,7 +86,11 @@ Widget::~Widget()
     delete ui;
 }
 void Widget::onClicked(BtnType type, QString num){
-    static QString str="";
-    str+=num;
-    ui->lineEdit->setText(str);
+    static QString str="";//用于显示运算式子
+    stack<BtnType> num_stack;
+    stack<BtnType> op_stack;//使用双栈法实现运算符优先级
+
+    switch(type){
+
+    }
 }
