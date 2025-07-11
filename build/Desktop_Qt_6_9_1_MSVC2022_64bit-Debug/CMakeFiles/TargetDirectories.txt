@@ -1,0 +1,8 @@
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/Qt_Calc.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/edit_cache.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/list_install_components.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/install.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/install/local.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/Qt_Calc_autogen_timestamp_deps.dir
+D:/QtProjects/Qt_Calc/build/Desktop_Qt_6_9_1_MSVC2022_64bit-Debug/CMakeFiles/Qt_Calc_autogen.dir
