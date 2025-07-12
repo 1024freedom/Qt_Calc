@@ -23,6 +23,7 @@ class Ui_Widget
 public:
     QLineEdit *lineEdit;
     QWidget *widget;
+    QGridLayout *gridLayout_2;
     QGridLayout *gridLayout;
     QPushButton *Num2;
     QPushButton *Num4;
@@ -44,12 +45,14 @@ public:
     QPushButton *Num3;
     QPushButton *Empty;
     QPushButton *Delete;
+    QPushButton *ParenLeft;
+    QPushButton *ParenRight;
 
     void setupUi(QWidget *Widget)
     {
         if (Widget->objectName().isEmpty())
             Widget->setObjectName("Widget");
-        Widget->resize(427, 280);
+        Widget->resize(427, 327);
         lineEdit = new QLineEdit(Widget);
         lineEdit->setObjectName("lineEdit");
         lineEdit->setGeometry(QRect(0, 0, 431, 81));
@@ -60,10 +63,12 @@ public:
         lineEdit->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         widget = new QWidget(Widget);
         widget->setObjectName("widget");
-        widget->setGeometry(QRect(0, 80, 426, 201));
-        gridLayout = new QGridLayout(widget);
+        widget->setGeometry(QRect(0, 80, 431, 244));
+        gridLayout_2 = new QGridLayout(widget);
+        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setContentsMargins(0, 0, 0, 0);
+        gridLayout = new QGridLayout();
         gridLayout->setObjectName("gridLayout");
-        gridLayout->setContentsMargins(0, 0, 0, 0);
         Num2 = new QPushButton(widget);
         Num2->setObjectName("Num2");
         QFont font1;
@@ -187,6 +192,21 @@ public:
         gridLayout->addWidget(Delete, 0, 1, 1, 1);
 
 
+        gridLayout_2->addLayout(gridLayout, 0, 0, 1, 2);
+
+        ParenLeft = new QPushButton(widget);
+        ParenLeft->setObjectName("ParenLeft");
+        ParenLeft->setFont(font1);
+
+        gridLayout_2->addWidget(ParenLeft, 1, 0, 1, 1);
+
+        ParenRight = new QPushButton(widget);
+        ParenRight->setObjectName("ParenRight");
+        ParenRight->setFont(font1);
+
+        gridLayout_2->addWidget(ParenRight, 1, 1, 1, 1);
+
+
         retranslateUi(Widget);
 
         QMetaObject::connectSlotsByName(Widget);
@@ -216,6 +236,8 @@ public:
         Num3->setText(QCoreApplication::translate("Widget", "3", nullptr));
         Empty->setText(QCoreApplication::translate("Widget", "AC", nullptr));
         Delete->setText(QCoreApplication::translate("Widget", "<-", nullptr));
+        ParenLeft->setText(QCoreApplication::translate("Widget", "(", nullptr));
+        ParenRight->setText(QCoreApplication::translate("Widget", ")", nullptr));
     } // retranslateUi
 
 };

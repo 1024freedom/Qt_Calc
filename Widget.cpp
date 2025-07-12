@@ -45,13 +45,19 @@ Widget::Widget(QWidget *parent)
         onClicked(BtnType::Op,"+");
     });
     connect(ui->Multi,&QPushButton::clicked,this,[this](){
-        onClicked(BtnType::Op,"×");
+        onClicked(BtnType::Op,"*");
     });
     connect(ui->Divide,&QPushButton::clicked,this,[this](){
-        onClicked(BtnType::Op,"÷");
+        onClicked(BtnType::Op,"/");
     });
     connect(ui->Mod,&QPushButton::clicked,this,[this](){
         onClicked(BtnType::Op,"%");
+    });
+    connect(ui->ParenLeft,&QPushButton::clicked,this,[this](){
+        onClicked(BtnType::Op,"(");
+    });
+    connect(ui->ParenRight,&QPushButton::clicked,this,[this](){
+        onClicked(BtnType::Op,")");
     });
     //小数点按钮绑定
     connect(ui->Point,&QPushButton::clicked,this,[this](){
@@ -80,18 +86,25 @@ Widget::~Widget()
     delete ui;
 }
 double Widget::strCalc(QString str){
-    str+="/";
+    str+="\\"; //放越界
     //运算符优先级映射
-    std::unordered_map<QString,Priority> pri={
-        {"-",Priority::ADD_SUB},{"+",Priority::ADD_SUB},
-        {"*",Priority::MUL_DIV_MOD},{"÷",Priority::MUL_DIV_MOD},
-        {"%",Priority::MUL_DIV_MOD}
+    std::unordered_map<QChar,Priority> pri={
+        {'-',Priority::ADD_SUB},{'+',Priority::ADD_SUB},
+        {'*',Priority::MUL_DIV_MOD},{'/',Priority::MUL_DIV_MOD},
+        {'%',Priority::MUL_DIV_MOD}
     };
     QStack<double> num_stack;
     QStack<QChar> op_stack;//使用双栈法实现运算符优先级
     auto calc=[&](){
+        if(num_stack.size()<2){
+            return;
+        }
         double b = num_stack.top();
         num_stack.pop();
+        if(num_stack.isEmpty()){
+            num_stack.push(b);
+            return;
+        }//栈空安全检查
         double a = num_stack.top();
         num_stack.pop();
         QChar op = op_stack.top();
@@ -124,7 +137,7 @@ double Widget::strCalc(QString str){
             double num=QString(c).toDouble();
             int weight=0;//小数权重
             int j;
-            for(j=i+1;j<str.size()-1;j++){
+            for(j=i+2;j<str.size()-1;j++){
                 if(!str[j].isDigit()){
                     break;
                 }
@@ -143,8 +156,7 @@ double Widget::strCalc(QString str){
                     break;
                 }else if(str[j]=='.'){
                     flag=true;
-                }
-                if(flag){
+                }else if(flag){
                     weight++;
                     num+=QString(str[j]).toDouble()/pow(10,weight);
                 }else{
@@ -160,16 +172,18 @@ double Widget::strCalc(QString str){
             }else if(c=='('){
                 op_stack.push(c);
             }else if(c==')'){
-                while(op_stack.top()!='('&&!op_stack.isEmpty()){
+                while(!op_stack.isEmpty()&&!num_stack.isEmpty()&&op_stack.top()!='('){
                     calc();
                 }
                 op_stack.pop();
-            }else if(c=='/'){
+            }else if(c=='\\'){
                 break;
             }else if(pri[op_stack.top()]>=pri[c]){
-                while(pri[op_stack.top()]>=pri[c]&&!op_stack.isEmpty()){
+                while(!op_stack.isEmpty()&&!num_stack.isEmpty()&&pri[op_stack.top()]>=pri[c]){
                     calc();
                 }
+                op_stack.push(c);
+            }else{
                 op_stack.push(c);
             }
         }
