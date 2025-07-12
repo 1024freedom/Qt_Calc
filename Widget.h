@@ -31,14 +31,11 @@ class Widget : public QWidget
 
 public:
     Widget(QWidget *parent = nullptr);
+    double strCalc(QString str);
     ~Widget();
 
 private:
     Ui::Widget *ui;
-
-    QString num1;
-    QString num2;
-    QString op;
 
 public slots:
     void onClicked(BtnType type,QString num);

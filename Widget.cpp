@@ -1,17 +1,11 @@
 #include "Widget.h"
 #include "./ui_widget.h"
-
+#include <QStack>
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    //运算符优先级映射
-    std::unordered_map<QString,Priority> priority_map={
-        {"-",Priority::ADD_SUB},{"+",Priority::ADD_SUB},
-        {"*",Priority::MUL_DIV_MOD},{"÷",Priority::MUL_DIV_MOD},
-        {"%",Priority::MUL_DIV_MOD}
-    };
     //数字按钮绑定
     connect(ui->Num0,&QPushButton::clicked,this,[this](){
         onClicked(BtnType::Num,"0");
@@ -85,12 +79,134 @@ Widget::~Widget()
 {
     delete ui;
 }
-void Widget::onClicked(BtnType type, QString num){
-    static QString str="";//用于显示运算式子
-    stack<BtnType> num_stack;
-    stack<BtnType> op_stack;//使用双栈法实现运算符优先级
+double Widget::strCalc(QString str){
+    str+="/";
+    //运算符优先级映射
+    std::unordered_map<QString,Priority> pri={
+        {"-",Priority::ADD_SUB},{"+",Priority::ADD_SUB},
+        {"*",Priority::MUL_DIV_MOD},{"÷",Priority::MUL_DIV_MOD},
+        {"%",Priority::MUL_DIV_MOD}
+    };
+    QStack<double> num_stack;
+    QStack<QChar> op_stack;//使用双栈法实现运算符优先级
+    auto calc=[&](){
+        double b = num_stack.top();
+        num_stack.pop();
+        double a = num_stack.top();
+        num_stack.pop();
+        QChar op = op_stack.top();
+        op_stack.pop();
 
-    switch(type){
+        switch(op.unicode()) {
+            case '+':
+                num_stack.push(a + b);
+                break;
+            case '-':
+                num_stack.push(a - b);
+                break;
+            case '*':
+                num_stack.push(a * b);
+                break;
+            case '/':
+                num_stack.push(a / b);
+                break;
+            case '%':
+                num_stack.push(std::fmodf(a,b));
+                break;
+        }
+    };
+    for(int i=0;i<str.size()-1;i++){
+        QChar c=str[i];
 
+        if(c.isDigit()&&str[i+1]!='.'&&!str[i+1].isDigit()){
+            num_stack.push(QString(c).toDouble());
+        }else if(c.isDigit()&&str[i+1]=='.'){
+            double num=QString(c).toDouble();
+            int weight=0;//小数权重
+            int j;
+            for(j=i+1;j<str.size()-1;j++){
+                if(!str[j].isDigit()){
+                    break;
+                }
+                weight++;
+                num+=QString(str[j]).toDouble()/pow(10,weight);
+            }
+            i=j-1;
+            num_stack.push(num);
+        }else if(c.isDigit()&&str[i+1].isDigit()){
+            double num=0;
+            bool flag=false;//判断是否进入小数部分
+            int weight=0;//小数权重
+            int j;
+            for(j=i;j<str.size()-1;j++){
+                if(!str[j].isDigit()&&str[j]!='.'){
+                    break;
+                }else if(str[j]=='.'){
+                    flag=true;
+                }
+                if(flag){
+                    weight++;
+                    num+=QString(str[j]).toDouble()/pow(10,weight);
+                }else{
+                    num=num*10.0+QString(str[j]).toDouble();
+                }
+
+            }
+            i=j-1;
+            num_stack.push(num);
+        }else{//运算符处理逻辑
+            if(op_stack.isEmpty()){
+                op_stack.push(c);
+            }else if(c=='('){
+                op_stack.push(c);
+            }else if(c==')'){
+                while(op_stack.top()!='('&&!op_stack.isEmpty()){
+                    calc();
+                }
+                op_stack.pop();
+            }else if(c=='/'){
+                break;
+            }else if(pri[op_stack.top()]>=pri[c]){
+                while(pri[op_stack.top()]>=pri[c]&&!op_stack.isEmpty()){
+                    calc();
+                }
+                op_stack.push(c);
+            }
+        }
     }
+    while(!op_stack.isEmpty()){
+        calc();
+    }
+    return num_stack.top();
+}
+void Widget::onClicked(BtnType type, QString push_input){
+    static QString str="";//用于显示运算式子
+    switch(type){
+        case BtnType::Num:
+            str+=push_input;
+            break;
+        case BtnType::Op:
+            str+=push_input;
+            break;
+        case BtnType::Point:
+            str+=push_input;
+            break;
+        case BtnType::Equal:
+            //执行运算显示结果
+            str=QString::number(strCalc(str),'g',6);//六位有效数字
+            break;
+        case BtnType::Delete:
+            str.chop(1);
+            break;
+        case BtnType::Oppo:{
+            //执行取反运算并显示结果
+            double res=QString(str).toDouble()*(-1);
+            str=QString::number(res,'g',6);
+            break;
+        }
+        case BtnType::Empty:
+            str.clear();
+            break;
+    }
+        ui->lineEdit->setText(str);
 }
